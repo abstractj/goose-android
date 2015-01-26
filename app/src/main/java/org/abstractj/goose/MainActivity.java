@@ -1,28 +1,16 @@
 package org.abstractj.goose;
 
 import android.content.res.AssetManager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -31,6 +19,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         try {
             testCertificate();
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -42,45 +32,15 @@ public class MainActivity extends ActionBarActivity {
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-
     }
 
     private void testCertificate() throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        // Load CAs from an InputStream
-// (could be from a resource or ByteArrayInputStream or ...)
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
-        InputStream caInput = loadCertificate("server.aerogear.dev");
-        java.security.cert.Certificate ca;
-        try {
-            ca = cf.generateCertificate(caInput);
-            System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
-        } finally {
-            caInput.close();
-        }
+        AssetManager assetManager = getResources().getAssets();
 
-//    // Create a KeyStore containing our trusted CAs
-        String keyStoreType = KeyStore.getDefaultType();
-        KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-        keyStore.load(null, null);
-        keyStore.setCertificateEntry("ca", ca);
-//
-//    // Create a TrustManager that trusts the CAs in our KeyStore
-    String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-    TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-    tmf.init(keyStore);
-//
-//    // Create an SSLContext that uses our TrustManager
-    SSLContext context = SSLContext.getInstance("TLS");
-    context.init(null,tmf.getTrustManagers(),null);
-//
-//    // Tell the URLConnection to use a SocketFactory from our SSLContext
-    new NetworkTask(context).execute();
-//        copyInputStreamToOutputStream(in, System.out);
+        // Tell the URLConnection to use a SocketFactory from our SSLContext
+        new HttpRequestTask(assetManager.open("random.org.pem")).execute();
+
     }
 
 
@@ -106,20 +66,4 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private InputStream loadCertificate(String certName) {
-        AssetManager assetManager = getResources().getAssets();
-
-        InputStream inputStream = null;
-        try {
-            inputStream = assetManager.open(certName);
-            if (inputStream != null) {
-                Log.d("MainActivity", "======================== It worked! ============================");
-                return inputStream;
-            }
-        } catch (IOException e) {
-            Log.d("MainActivity", "Super fail!");
-            e.printStackTrace();
-        }
-        return inputStream;
-    }
 }
