@@ -3,8 +3,10 @@ package org.abstractj.goose;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -34,9 +36,25 @@ public class MainActivity extends ActionBarActivity {
     private void testCertificate() throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
         AssetManager assetManager = getResources().getAssets();
+        InputStream pemInputStream = assetManager.open("random.org.pem");
 
         // Tell the URLConnection to use a SocketFactory from our SSLContext
-        new HttpRequestTask(assetManager.open("random.org.pem")).execute();
+        new HttpRequestTask(pemInputStream, new HttpRequestTaskCallback()).execute();
+
+    }
+
+    private final class HttpRequestTaskCallback implements Callback<Void> {
+
+        @Override
+        public void onSuccess(Void data) {
+            Toast.makeText(getApplicationContext(),
+                    "Seems the request works", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
 
     }
 

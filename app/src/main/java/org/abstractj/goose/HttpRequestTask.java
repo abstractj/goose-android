@@ -23,10 +23,14 @@ public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
 
     private static final String TAG = HttpRequestTask.class.getSimpleName();
 
-    private InputStream certificate;
+    private final InputStream certificate;
+    private final Callback<Void> callback;
 
-    public HttpRequestTask(InputStream certificate) {
+    private Exception exception;
+
+    public HttpRequestTask(InputStream certificate, Callback<Void> callback) {
         this.certificate = certificate;
+        this.callback = callback;
     }
 
     @Override
@@ -48,15 +52,30 @@ public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
             StreamTokenizer tokenizer = new StreamTokenizer(instream);
         } catch (NoSuchAlgorithmException e) {
             Log.e(TAG, e.getMessage(), e);
+            this.exception = e;
         } catch (MalformedURLException e) {
             Log.e(TAG, e.getMessage(), e);
+            this.exception = e;
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
+            this.exception = e;
         } catch (KeyManagementException e) {
             Log.e(TAG, e.getMessage(), e);
+            this.exception = e;
         }
 
         return null;
 
     }
+
+    @Override
+    protected void onPostExecute(InputStream inputStream) {
+        super.onPostExecute(inputStream);
+        if (exception == null) {
+            callback.onSuccess(null);
+        } else {
+            callback.onFailure(exception);
+        }
+    }
+
 }
