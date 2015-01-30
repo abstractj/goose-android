@@ -1,6 +1,7 @@
 package org.abstractj.goose;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,12 +21,13 @@ import javax.net.ssl.TrustManager;
  */
 public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
 
+    private static final String TAG = HttpRequestTask.class.getSimpleName();
+
     private InputStream certificate;
 
     public HttpRequestTask(InputStream certificate) {
         this.certificate = certificate;
     }
-
 
     @Override
     protected InputStream doInBackground(Void... params) {
@@ -45,13 +47,13 @@ public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
             InputStreamReader instream = new InputStreamReader(connection.getInputStream());
             StreamTokenizer tokenizer = new StreamTokenizer(instream);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         } catch (KeyManagementException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return null;
