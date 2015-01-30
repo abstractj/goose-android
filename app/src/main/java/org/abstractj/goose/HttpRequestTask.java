@@ -19,7 +19,7 @@ import javax.net.ssl.TrustManager;
 /**
  * Created by abstractj on 1/26/15.
  */
-public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
+public class HttpRequestTask extends AsyncTask<String, Void, InputStream> {
 
     private static final String TAG = HttpRequestTask.class.getSimpleName();
 
@@ -34,7 +34,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
     }
 
     @Override
-    protected InputStream doInBackground(Void... params) {
+    protected InputStream doInBackground(String... urls) {
 
         TrustManager tm[] = { new AeroGearTrustManager(certificate) };
 
@@ -43,7 +43,7 @@ public class HttpRequestTask extends AsyncTask<Void, Void, InputStream> {
             context = SSLContext.getInstance("TLS");
             context.init(null, tm, null);
 
-            URL url = new URL("https://www.random.org");
+            URL url = new URL(urls[0]);
 
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setSSLSocketFactory(context.getSocketFactory());
