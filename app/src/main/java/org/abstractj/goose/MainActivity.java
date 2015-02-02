@@ -22,6 +22,7 @@ public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private EditText responsePanel;
+    private EditText customUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         responsePanel = (EditText) findViewById(R.id.response_panel);
+        customUrl = (EditText) findViewById(R.id.custom_url);
 
         final RadioGroup radioGroup = (RadioGroup) findViewById(R.id.server_url);
 
@@ -36,11 +38,26 @@ public class MainActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String url;
                 int radioButtonId = radioGroup.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(radioButtonId);
-                testCertificate(radioButton.getText().toString());
+                if(radioButtonId == R.id.custom) {
+                    url = customUrl.getText().toString();
+                } else {
+                    RadioButton radioButton = (RadioButton) findViewById(radioButtonId);
+                    url = radioButton.getText().toString();
+                }
+                testCertificate(url);
             }
         });
+    }
+
+    public void hideCustomUrl(View view) {
+        customUrl.setEnabled(false);
+    }
+
+    public void showCustomUrl(View view) {
+        customUrl.setEnabled(true);
+        customUrl.hasFocus();
     }
 
     private void testCertificate(String url) {
@@ -56,6 +73,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
+
 
     private final class HttpRequestTaskCallback implements Callback<Void> {
 
